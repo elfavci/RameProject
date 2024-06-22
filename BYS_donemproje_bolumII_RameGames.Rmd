@@ -1,0 +1,720 @@
+---
+title: "Bilgi Yönetim Sistemleri - Bitirme Projesi Rapor : Simge Buse Kaplan-210401011, Elif Avcı-200401073, Tesnim Strazimiri- 200401115, Sevim Kendir-190401075"
+output: html_document
+date: "2024-05-24"
+---
+
+## Q1: İş probleminin tanımı 
+
+**Rame Games**, oyuncuların oyun alışkanlıklarını inceleyerek onlara daha eğlenceli ve bağımlılık yaratacak oyunlar sunmayı hedefleyen bir oyun şirketidir. Oyun geliştirme sürecinin başında oyuncuların oyunlardan beklentilerini, genel beğenilerini ve tercihlerini değerlendirmek adına 2024 verileri değerlendirilmek üzere seçilmiştir. Ancak kullanılacak olan SuiteCRM platformunda mapping işlemi esnasında yaşanan bir takım uyumsuzluklar ve 2024 yılının yalnızca dört aylık veri içeriyor olmasından kaynaklı olarak 2023 yılının 12 aylık verileri tercih edilmiştir. SuiteCRM, RESTful API aracılığıyla entegrasyonlar yapılmasına olanak tanır. API, SuiteCRM verilerine erişim ve veri manipülasyonu için kullanılabilir. SuiteCRM, müsteri ilişkileri yönetimi ve açık kaynaklı proje alanlarını bir araya getiren bir platformdur. Platform, Docker ile kurulabilme, hızlı bir şekilde geliştirme ve test ortamları oluşturmaya olanak verir. Docker, SuiteCRM'i hızlı bir şekilde dağıtıp kullanımı sağlayacak esnek bir altyapı sunar.
+
+## Q2: İş Problemini Çözmede Kullanılacak Data Seti
+
+Veriyi kaggle platformundan bulduk. 
+ 
+**Veri Seti linki =>**  https://www.kaggle.com/datasets/thedevastator/global-video-game-sales
+
+ Bu veri seti, 100.000 kopyadan fazla satışı olan video oyunlarının bir listesini içerir. Veri seti, vgchartz.com'dan kazınarak oluşturulmuştur.Hangi platformların global satışları yönlendirdiğini, farklı bölgelerde en başarılı türlerin neler olduğunu ve bu faktörlerin zaman içinde nasıl değiştiğini gözlemler. Bu verileri analiz ederek oyun sektörünü daha iyi anlayabilir ve oyun geliştiricilerinin başarıya ulaşmasını sağlayan trendleri keşfetmeye yarar.
+
+**Veri Setindeki Öznitelikler:**
+
+
+- <span style="color:cornflowerblue;"> *Rank:* </span> Oyunun global satışlara göre sıralaması. 
+- <span style="color:cornflowerblue;"> *Name:* </span> Oyunun adı. 
+- <span style="color:cornflowerblue;"> *Platform:* </span> Oyunun yayımlandığı platform. 
+- <span style="color:cornflowerblue;"> *Year:* </span> Oyunun yayımlandığı yıl. 
+- <span style="color:cornflowerblue;"> *Genre:* </span> Oyunun türü. 
+- <span style="color:cornflowerblue;"> *Publisher:* </span> Oyunun yayımlayıcısı. 
+- <span style="color:cornflowerblue;"> *NA_Sales:* </span> Oyunun Kuzey Amerika'daki satışları. 
+- <span style="color:cornflowerblue;"> *EU_Sales:* </span> Oyunun Avrupa'daki satışları. 
+- <span style="color:cornflowerblue;"> *JP_Sales:* </span> Oyunun Japonya'daki satışları. 
+- <span style="color:cornflowerblue;"> *Other_Sales:* </span> Oyunun diğer bölgelerdeki satışları.
+- <span style="color:cornflowerblue;"> *Global_Sales:* </span> Oyunun dünya genelindeki toplam satışları.
+
+Veri üzerinde öznitelik bilgilerinin hepsini küçük harf olarak düzenledik.
+
+## Q3: Veri Seti Keşifsel Analizi
+
+*Veri setinde önemli sütunlar ve bunların veri tipleri şunlardır:*
+
+- <span style="color:cornflowerblue;"> *Rank:* </span> ( char )
+- <span style="color:cornflowerblue;"> *Name:* </span> ( char )
+- <span style="color:cornflowerblue;"> *Platform:* </span> ( char ) 
+- <span style="color:cornflowerblue;"> *Genre:* </span> ( char ) 
+- <span style="color:cornflowerblue;"> *Publisher:* </span> ( char ) 
+- <span style="color:cornflowerblue;"> *NA_Sales:* </span> ( numeric ) 
+- <span style="color:cornflowerblue;"> *EU_Sales:* </span> ( numeric ) 
+- <span style="color:cornflowerblue;"> *JP_Sales:* </span> ( numeric ) 
+- <span style="color:cornflowerblue;"> *Other_Sales:* </span> ( numeric )
+- <span style="color:cornflowerblue;"> *Global_Sales:* </span> ( numeric )
+
+
+```{r, results = 'hide', echo=FALSE}
+data <- read.csv("lastgame.csv")
+#satır sayısını öğrenme
+num_rows <- nrow(data)
+print(num_rows)
+
+#sutun sayısını öğrenme
+num_cols <- ncol(data)
+print(num_cols)
+
+```
+
+
+
+```{r, warning=FALSE,results = 'hide',echo=FALSE}
+#NA değer kontrolü
+na_sayisi <- sum(is.na(data))
+
+print(paste("Toplam Na deger sayisi:", na_sayisi))
+
+#sütün bazlı
+sutun_na_sayisi <- colSums(is.na(data))
+print(sutun_na_sayisi)
+
+#Na değerlerini silme
+data_clean <- na.omit(data)
+#Yeni veri çerçevesini görüntüle
+#print(data_clean)
+#sutun bazında tekrar konrol
+sutun_na <- colSums(is.na(data_clean))
+print(sutun_na)
+
+#Satır sayısını öğrenme
+num_rowsof <- nrow(data_clean)
+print(num_rowsof)
+
+#Sütun sayısını öğrenme
+num_colsof <- ncol(data_clean)
+print(num_colsof)
+
+```
+
+
+
+```{r, fig.width=10, fig.height=8, echo = FALSE, warning=FALSE, message=FALSE}
+#Sütunun benzersiz değerlerini ve sayısını bul
+unique_value <- unique(data_clean$platform)
+unique_value_sum <- length(unique_value)
+
+#Benzersiz değerleri ve sayılarını görüntüle
+#print(unique_value)
+#print(unique_value_sum)
+ 
+library(ggplot2)
+library(dplyr)
+#Sütunun frekans tablosunu oluştur
+frekans_tablosu <- table(data_clean$platform)
+
+frekans_tablosu <- data_clean %>%
+  count(platform) %>%
+  mutate(yuzde = n / sum(n) * 100) %>%
+  arrange(desc(yuzde)) %>%
+  slice(1:10)
+
+##renkler <- rainbow(length(unique(data_clean$platform)))
+#Pasta grafiğini oluşturun
+pasta_grafik <- ggplot(frekans_tablosu, aes(x = "", y = yuzde, fill = platform)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+ scale_fill_brewer(palette = "Set1") +
+  theme_void() +
+  theme(legend.position = "right") +
+  labs(title = "En Yuksek Yuzdelik Degerlere Sahip 10 Platform") +
+  geom_text(aes(label = paste0(round(yuzde, 1), "%")), position = position_stack(vjust = 0.5)) +
+  theme(
+    plot.margin = unit(c(1, 1, 1, 1), "cm") # Kenar boşluklarını ayarla
+  )
+
+#Grafiği görüntüle
+print(pasta_grafik)
+
+```
+
+ Bu pasta grafiği, en yüksek yüzdelik değerlere sahip 10 oyun platformunu göstermektedir. Her dilim, belirli bir platformun yüzdelik dilimini ve o platformun toplam satışlardaki payını temsil eder. Grafik üzerinden şu yorumlar yapılabilir:
+ 
+- <span style="color:red;"> *DS (Kırmızı):* </span> %7.7'lik bir payla altıncı sıradadır. DS'in de yüksek satışlara sahip olduğunu ve popüler bir platform olduğunu gösterir.
+
+- <span style="color:blue;"> *GBA (Mavi):* </span> %3.8'lik bir payla dokuzuncu sıradadır. GBA'nin de satışlarda önemli bir yeri olduğu görülmektedir.
+
+- <span style="color:green;"> *PC (Yeşil):* </span> %3.1'lik bir payla sekizinci sıradadır. PC'nin de satışlarda önemli bir yeri olduğu görülmektedir.
+
+- <span style="color:purple;"> *PS (Mor):* </span> %9.6'lık bir payla beşinci sıradadır. PS'in de oldukça popüler olduğunu ve önemli bir satış payına sahip olduğunu gösterir.
+
+- <span style="color:orange;"> *PS2 (Turuncu):* </span> %15.5'lik bir payla en yüksek yüzdelik değere sahip platformdur. Bu, PS2'nin tüm platformlar arasında en yüksek satış rakamlarına sahip olduğunu gösterir.
+
+- <span style="color:yellow;"> *PS3 (sarı):* </span> %12.3'lük bir payla ikinci sırada yer almaktadır. PS3'ün de oldukça popüler olduğunu ve önemli satış rakamlarına ulaştığını gösterir.
+
+- <span style="color:brown;"> *PSP (Kahverengi):* </span> %3.7'lik bir payla yedinci sıradadır. PSP'nin de satışlarda önemli bir yeri olduğu görülmektedir.
+
+- <span style="color:pink;"> *Wii (pembe):* </span> %8.2'lik payla dördüncü sıradadır. Wii'nin de yüksek satışlara sahip bir platform olduğu görülmektedir.
+
+- <span style="color:grey;"> *X360 (Gri):* </span> %11.1'lik bir paya sahip olup üçüncü sırada yer alır. X360'ın da yüksek satışlara sahip olduğu anlaşılmaktadır.
+
+- <span style="color:black;"> *XB (Beyaz):* </span> %3.9'lik bir payla onuncu sıradadır. XB'nin de satışlarda önemli bir yeri olduğu görülmektedir.
+
+
+
+Grafikte en yüksek yüzdelik değerlere sahip 10 oyun platformu analiz edilmiştir. En yüksek satış oranına sahip platformlar sırasıyla PS2 (%15.5), PS3 (%12.3), ve X360 (%11.1) olarak öne çıkmaktadır. Bu durum, bu platformların oyun endüstrisindeki dominant pozisyonlarını ve popülaritelerini yansıtmaktadır. Wii, PS, DS ve diğer platformlar da önemli satış rakamlarına ulaşarak toplam satışlarda dikkate değer bir paya sahiptir. Genel olarak, bu sonuçlar oyun endüstrisinde belirli platformların pazarın büyük bir kısmını elinde bulundurduğunu ve kullanıcılar arasında geniş kabul gördüğünü göstermektedir. Özellikle PS2, PS3 ve X360 gibi platformların yüksek satış performansları, bu cihazların teknolojik yenilikleri ve geniş oyun kütüphaneleri ile ilişkilendirilebilir.
+
+
+
+```{r, fig.width=10, fig.height=8, echo = FALSE ,  warning=FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+
+top_ten_games <- data_clean %>%
+  arrange(rank) %>%
+  slice(1:10) %>%
+  select(name, global_sales)
+
+#Histogram grafiğini oluşturun
+hist_graph<-ggplot(top_ten_games, aes(x = reorder(name, global_sales), y = global_sales, fill = name)) +
+  geom_bar(stat = "identity") +
+  labs(title = "En cok Satan 10 Oyun",
+       x = "Oyun İsimleri",
+       y = "Global Satıslar") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(palette = "Set3") +
+  guides(fill = "none") # Legendi kaldırır
+
+print(hist_graph)
+```
+
+ Oluşturulan sütun grafiğinde, en çok satan 10 oyunun global ölçekteki milyonluk satış değerleri yer almaktadır. Grafikte Wii Sport’un 80'in üstüne çıkarak en yüksek satışa sahip olduğu görülmektedir. Wii Sport’tan sonra en yüksek satışa sahip oyunun Duck Hunt’ın yaklaşık 30'a yakın satışa sahip olduğu ancak diğer oyunlarının hiçbirinin 10'un üstünde satış gerçekleştiremediği gözlemlenmektedir. 
+
+```{r,echo=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = FALSE)
+mean_values <- sapply(data_clean[, c("na_sales", "eu_sales", "jp_sales", "other_sales", "global_sales")], mean)
+median_values <- sapply(data_clean[, c("na_sales", "eu_sales", "jp_sales", "other_sales", "global_sales")], median)
+mode_values <- sapply(data_clean[, c("na_sales", "eu_sales", "jp_sales", "other_sales", "global_sales")], function(x) {
+  tbl <- table(x)
+  as.numeric(names(tbl)[which.max(tbl)])
+})
+
+#Sonuçları bir veri çerçevesine dönüştürme
+result_table <- data.frame(mean = mean_values, median = median_values, mode = mode_values)
+
+#Tabloyu HTML olarak yazdırma
+knitr::kable(result_table, caption = "SATIŞ  DEĞERLERİNİN ORTALAMASI, MEDYANI VE MODU")
+
+
+```
+
+ Bu tablo, farklı bölgelerdeki satış değerlerinin istatistiksel özetini sunmaktadır. İncelenen bölgeler Kuzey Amerika (NA), Avrupa (EU), Japonya (JP), diğer bölgeler (Other), ve küresel (Global) satışlardır. Tabloda her bölge için ortalama (mean), medyan (median) ve mod (mode) değerleri yer almaktadır.
+
+<span style="color:violet;"> **Mean(Ortalama):** </span> Mean veri setindeki tüm veri noktalarının toplamının toplam veri noktasına bölümü ile edilen bir “ortalama” sayıdır.
+
+<span style="color:violet;"> **Median(Ortanca Değer):** </span> Median sıralı bir veri setindeki orta değeri göstermektedir.
+
+<span style="color:violet;"> **Mode(Mod) :** </span> Mode bir veri setinde en sık gözlemlenen değeri göstermektedir.
+
+Bu tablodaki ortalama, medyan ve mod değerlerinin karşılaştırılması, farklı bölgelerdeki satış dağılımlarını daha iyi anlamamızı sağlar. Örneğin:
+
+- <span style="color:cornflowerblue;"> **Kuzey Amerika (NA) Satışları:** </span>  NA satışlarının ortalaması ve medyanı, bu bölgedeki satışların nasıl dağıldığını anlamamıza yardımcı olur.
+
+- <span style="color:cornflowerblue;"> **Avrupa (EU) Satışları:** </span>  EU satışlarının ortalama ve medyan değerleri, Avrupa pazarının Kuzey Amerika ile kıyaslandığında nasıl bir performans sergilediğini gösterir.
+
+- <span style="color:cornflowerblue;"> **Japonya (JP) Satışları:** </span> JP satışlarındaki ortalama ve medyan değerlerinin diğer bölgelerle karşılaştırılması, Japonya'nın pazardaki konumunu değerlendirmemize yardımcı olur.
+
+- <span style="color:cornflowerblue;"> **Diğer Bölgeler ve Küresel Satışlar:** </span> Diğer bölgeler ve küresel satışlar için hesaplanan değerler, bu bölgelerin toplam satışlar içindeki payını gösterir.
+
+Genel olarak tablodaki satış verilerine göre pozitif çarpıklık söz konusudur. Ortalama medyandan büyük olduğu için, bu veri setinin sağa çarpık olduğunu söylenebilir. Aynı zamanda satışların çoğunluğu ortalama satış değerinin altında yoğunlaşmış, ancak bazı yüksek satış değerleri ortalamayı artırmıştır.
+Bu değerlendirmeler, satış stratejilerini belirlerken ve bölgesel pazarların önemini analiz ederken faydalı olacaktır.
+
+
+```{r,echo=FALSE}
+library(knitr)
+#İlk 30 veriyi almak
+data_head <- head(data_clean, 30)
+
+#Tabloyu HTML olarak yazdırma
+knitr::kable(data_head, caption = "VERİ SETİNDEKİ İLK 30 VERİ")
+```
+
+Veri setinde yer alan ilk 30 satıra göre tabloda çizdirildi. Bu tabloya göre:
+
+- Birinci sırada yer alan Wii Sports oyunu global satışlarda birinci sıraya sahipken Japonya’daki satışlarında diğer eyaletlere göre geride kaldığı görülmektedir.
+
+- Publisher olarak Nintendo’nun 24 oyunu, Take-Two Interactive’in 4 oyunu, Sony Computer Entartainment’ın 1 oyunu, Microsoft Game Studios’un 1 oyunu yer almaktadır. Buna göre Nintendo hakimiyeti eline aldığı görülüyor.
+
+
+## Q4: Veri Setinin BYS Platformuna İthali
+
+Veri setimizi SuiteCRM platformuna entegre etmek için manuel import yöntemini kullanıldı ve belirli adımlar izlenildi. İlk olarak, SuiteCRM'e yönetici olarak giriş yapıldı ve "Admin" menüsünden "Module Builder" aracılığıyla "RameGames" adlı bir paket oluşturuldu.Bu paketin içine “Game1” adlı bir module oluşturuldu. Bu modülde, veri setinin sütun adlarını temsil eden alanları "Add Layouts" bölümünde “ListView” kısmında oluşturuldu ve mapping işlemi için gereken değişkenleri "Add Fields" kısmında eklendi. Sonrasında, CSV formatındaki veri seti bu modüle import edildi.
+Sütunlar otomatik olarak eşleştirildi ve veriler "Game1" sayfasında görünür hale getirildi. Bu adımlar sayesinde, veri seti SuiteCRM'e başarılı bir şekilde entegre edildi ve analizler için gerekli veriler platformda kullanılabilir hale getirildi.
+
+## Q5: Yapılması Planlanan Veri Analizi
+
+<span style="color:cornflowerblue;">**Amaç**<span>
+
+Rame Games'in oyuncu etkileşimlerini optimize etmek, oyun performansını iyileştirmek, teknik sorunları hızlıca tespit etmek ve pazarlama stratejilerini etkili bir şekilde geliştirmek amacıyla mevcut veri seti üzerinde kritik analizler yapılması planlandı. Bu analizler, SuiteCRM'den çekilen veriler kullanılarak R Studio'da gerçekleştirilecek ve çeşitli grafikler ve istatistiksel yöntemler ile desteklenecektir.
+
+<span style="color:cornflowerblue;">*Analiz Planı*<span>
+
+- Veri Hazırlığı ve Temizleme
+
+- Eksik verileri kontrol etmek ve gerekli temizleme işlemlerini yapmak.
+
+- Satış verilerinin (na_sales, eu_sales, jp_sales, other_sales, global_sales) doğru biçimde olduğundan emin olmak.
+
+<span style="color:cornflowerblue;">*Temel İstatistiksel Analizler*<span>
+
+- Satış verilerinin (na_sales, eu_sales, jp_sales, other_sales, global_sales) ortalama, medyan, minimum ve maksimum değerlerini hesaplamak.
+
+- Farklı platformlar, yıllar, türler bazında satış performansını analiz etmek.
+
+<span style="color:cornflowerblue;">*Grafiksel Analizler*<span>
+
+- Bar Grafikleri: Platform, tür bazında satış dağılımlarını göstermek.
+
+- Dağılım Grafikleri: Farklı bölgelerdeki (NA, EU, JP, Other) satışların global satışlarla ilişkisini incelemek.
+
+<span style="color:cornflowerblue;">*Kategorik Analizler*<span>
+
+- Platform, tür bazında satış performansını analiz etmek.
+
+- Farklı türlerin belirli platformlardaki başarı oranlarını incelemek.
+
+- Segmentasyon ve Kümelenme Analizleri
+
+- Satış verilerini kullanarak oyunları yüksek satışlı ve düşük satışlı olarak segmentlere ayırmak.
+
+- Belirli segmentlerin (örneğin, yüksek satışlı oyunlar) platform ve tür bazında dağılımlarını incelemek.
+
+## Q6 : Çalışan platformun gösterildiği sesli anlatımlı video
+
+**Video Linki : ** 
+
+*https://www.youtube.com/watch?v=pVM2XgaynU4*
+
+
+
+## Veri Dağılımı Analizi
+```{r, fig.width=10, fig.height=8, echo = FALSE, warning=FALSE, message=FALSE}
+# Merkezi eğilim ölçütleri
+mean_sales <- mean(data_clean$global_sales)
+median_sales <- median(data_clean$global_sales)
+#print(mean_sales)
+#print(median_sales)
+
+# Yayılma ölçütleri
+standart_deviation <- sd(data_clean$global_sales)
+variance <- var(data_clean$global_sales)
+#print(standart_deviation)
+#print(variance)
+
+```
+
+- <span style="color:cornflowerblue;"> *Ortalama (mean_sales):* </span> Veri setindeki tüm global satışların ortalama değeridir. Ortalama, tüm veri noktalarının toplamını toplam veri noktası sayısına böler. Bu durumda, ortalama global satışlar yaklaşık olarak 1.77 milyon birimdir. Bu, veri setindeki global satışların ortalamasıdır.
+
+- <span style="color:cornflowerblue;"> *Medyan (median_sales):* </span> Veri setindeki global satışların orta değeridir. Medyan, veri setinin ortasındaki değerdir; yani, veri seti küçükten büyüğe sıralandığında tam olarak ortada olan değerdir. Bu durumda, medyan global satışlar yaklaşık olarak 1.04 milyon birimdir. Bu, veri setindeki global satışların ortanca değeridir.
+
+- <span style="color:cornflowerblue;"> *Standart Sapma (standard deviation):* </span> Standart sapma, bir veri kümesindeki değerlerin ortalama etrafında ne kadar yayıldığını ölçer. Varyansın karekökü olarak hesaplanır. Standart sapma, varyansın daha yorumlanabilir bir formudur çünkü orijinal veri setinin ölçü birimlerine geri döner. Daha yüksek bir standart sapma, veri noktalarının ortalama etrafında daha fazla dağıldığını ve daha düşük bir standart sapma, veri noktalarının ortalama etrafında daha sıkı bir şekilde gruplandığını gösterir. Bu durumda, global satışların standart sapması 2.83'tür.
+
+- <span style="color:cornflowerblue;"> *Varyans (variance):* </span> Varyans, bir veri kümesindeki değerlerin dağılımının genişliğini ölçer. Bu, her bir veri noktasının ortalama etrafında ne kadar dağıldığını gösterir. Daha yüksek bir varyans, veri noktalarının ortalama etrafında daha geniş bir dağılıma sahip olduğunu ve daha düşük bir varyans, veri noktalarının ortalama etrafında daha sıkı bir şekilde gruplandığını gösterir. Bu durumda, global satışların varyansı 8.04'tür.
+
+
+
+
+```{r, fig.width=10, fig.height=8, echo = FALSE, warning=FALSE, message=FALSE}
+
+# Korelasyon Analizi
+correlation_jp_global <- cor(data_clean$jp_sales, data_clean$global_sales)
+correlation_eu_global <- cor(data_clean$eu_sales, data_clean$global_sales)
+correlation_na_global <- cor(data_clean$na_sales, data_clean$global_sales)
+correlation_other_global <- cor(data_clean$other_sales, data_clean$global_sales)
+
+# Grafik alanını oluşturma
+par(mfrow=c(2,2))  # 2x2 bir alt grafik düzeni oluşturur
+
+# Japonya Satışları ile Global Satışlar arasındaki korelasyon için scatter plot
+plot(data_clean$jp_sales, data_clean$global_sales,
+     xlab = "Japonya Satışları", ylab = "Global Satışlar",
+     main = paste("Japonya Satışları ile Global Satışlar Arasındaki Korelasyon\nKorelasyon: ", round(correlation_jp_global, 2)),
+     col= "red", pch = 16)
+
+# Avrupa Satışları ile Global Satışlar arasındaki korelasyon için scatter plot
+plot(data_clean$eu_sales, data_clean$global_sales,
+     xlab = "Avrupa Satışları", ylab = "Global Satışlar",
+     main = paste("Avrupa Satışları ile Global Satışlar Arasındaki Korelasyon\nKorelasyon: ", round(correlation_eu_global, 2)),
+     col="cornflowerblue", pch = 16)
+
+# Kuzey Amerika Satışları ile Global Satışlar arasındaki korelasyon için scatter plot
+plot(data_clean$na_sales, data_clean$global_sales,
+     xlab = "Kuzey Amerika Satışları", ylab = "Global Satışlar",
+     main = paste("Kuzey Amerika Satışları ile Global Satışlar Arasındaki Korelasyon\nKorelasyon: ", round(correlation_na_global, 2)),
+     col="green", pch = 16)
+
+# Diğer Satışlar ile Global Satışlar arasındaki korelasyon için scatter plot
+plot(data_clean$other_sales, data_clean$global_sales,
+     xlab = "Diger Satışlar", ylab = "Global Satışlar",
+     main = paste("Diger Satışlar ile Global Satışlar Arasındaki Korelasyon\nKorelasyon: ", round(correlation_other_global, 2)),
+     col="magenta", pch = 16)
+
+```
+
+# Korelasyon analizi nedir?
+
+İki veya daha fazla değişken arasındaki ilişkinin yönünü ve şiddetini belirlemek için kullanılan istatistiksel bir yöntemdir. Korelasyon katsayısı, bu ilişkinin ne kadar güçlü olduğunu ve pozitif mi, negatif mi olduğunu gösterir. 
+
+Bu grafiklerde Japonya, Avrupa, Kuzey Amerika ve Diğer satış bölgeleri ile global satışları arasındaki korelasyonları inceledik.
+
+- <span style="color:cornflowerblue;"> **Japonya Satışları ile Global Satışlar Arasındaki Korelasyon : 0.58** </span>
+
+    *Yorum:* Japonya satışları ile global satışlar arasında orta düzeyde bir pozitif korelasyon vardır. Bu, Japonya'da yüksek satış yapan oyunların global satışlarının da genellikle yüksek olduğunu gösterir, ancak bu ilişki çok güçlü değildir.
+      
+    *Çıkarım:* Japonya pazarı, global satışlara katkıda bulunur ancak diğer bölgeler kadar belirleyici değildir. Oyun geliştiricileri ve yayıncıları, Japonya'da satışları artırmak için belirli stratejiler geliştirebilirler, ancak bu tek başına global başarıyı garanti         etmez.
+      
+- <span style="color:cornflowerblue;"> **Avrupa Satışları ile Global Satışlar Arasındaki Korelasyon : 0.89** </span>
+
+    *Yorum:* Avrupa satışları ile global satışlar arasında yüksek düzeyde bir pozitif korelasyon vardır. Bu, Avrupa'da iyi satan oyunların  genellikle globalde de iyi sattığını gösterir.
+    
+    *Çıkarım:* Avrupa pazarı, global satışların önemli bir göstergesi olarak kabul edilebilir. Oyun geliştiricileri ve yayıncıları, Avrupa'da başarılı olmak için lokalizasyon ve bölgesel pazarlama stratejilerine önem vermelidir.
+    
+- <span style="color:cornflowerblue;"> **Kuzey Amerika Satışları ile Global Satışlar Arasındaki Korelasyon : 0.93** </span>
+
+    *Yorum:* Kuzey Amerika satışları ile global satışlar arasında çok yüksek düzeyde bir pozitif korelasyon vardır. Bu, Kuzey Amerika'da yüksek satış yapan oyunların globalde de çok yüksek satış yaptığını gösterir.
+    
+    *Çıkarım:* Kuzey Amerika, global satışların en güçlü göstergesi olarak öne çıkıyor. Oyun geliştiricileri ve yayıncıları için bu pazarın önemi çok büyüktür. Kuzey Amerika'da başarılı olan bir oyun büyük ihtimalle globalde de başarılı olacaktır.
+    
+- <span style="color:cornflowerblue;"> **Diğer Satışlar ile Global Satışlar Arasındaki Korelasyon : 0.71** </span>
+
+    *Yorum:* Diğer satış bölgeleri ile global satışlar arasında orta düzeyde yüksek bir pozitif korelasyon vardır. Bu, diğer bölgelerde yüksek satış yapan oyunların globalde de yüksek satış yaptığını gösterir, ancak ilişki Kuzey Amerika ve Avrupa kadar güçlü değildir.
+
+    *Çıkarım:* Diğer bölgeler de global satışlara önemli katkıda bulunur. Bu bölgeler için de lokalizasyon ve bölgesel pazarlama stratejileri önemlidir, ancak bu bölgeler Kuzey Amerika ve Avrupa kadar belirleyici değildir.
+
+
+## Türlere Göre Satışlar
+
+```{r, fig.width=10, fig.height=8, echo = FALSE, warning=FALSE, message=FALSE}
+# ggplot2 paketini yükle
+library(ggplot2)
+library(tidyr)
+
+
+# Türlere göre satışları hesapla
+sales_by_genre <- aggregate(cbind(na_sales, eu_sales, jp_sales, other_sales, global_sales) ~ genre, data = data_clean, sum)
+
+# Bar grafiği için veri çerçevesi oluştur
+genre_sales <- pivot_longer(sales_by_genre, cols = c(na_sales, eu_sales, jp_sales, other_sales), names_to = "region", values_to = "sales")
+
+# Bar grafiğini çiz
+bar_chart <- ggplot(genre_sales, aes(x = genre, y = sales, fill = region)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Tur", y = "Satis Miktari", title = "Turlere Gore Satışlar") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = c("na_sales" = "#1f78b4", "eu_sales" = "#a6cee3", "jp_sales" = "#33a02c", "other_sales" = "#b2df8a")) +
+  guides(fill = guide_legend(title = "Bolge"))
+#tablo
+library(dplyr)
+library(knitr)
+kable(sales_by_genre, caption = "Turlere Gore Satışlar")
+# Bar grafiğini görüntüle
+print(bar_chart)
+# Tabloyu görüntüleyin
+
+#print(sales_by_genre)
+
+```
+
+Bu grafikte ise türlerin bölgelere göre satış miktarları görülmektedir. Tüm türler için en yüksek satışın Kuzey Amerika’da olduğu bariz bir şekilde ortaya çıkmaktadır, devamında ise Avrupa satışları, Japonya satışları ve diğer ülke satışları gelmektedir. Kategoriler içinde en çok tercih edilen “Action” , devamında ise “Sport” ve “Shooter” kategorileri satışlarda en çok tercih edilen ikinci ve üçüncü oyunlar olarak grafikte yerini alıyor. Diğer kategoriler ise sadece bu üç kategorinin geçtiği 400’lük satış barajının altında satış miktarlarına sahiptir.   En az satışı yapılan oyunlar ise “Strategy” ve “Adventure” kategorisine ait oyunlar olduğu görülmektedir.
+
+## Oyun Türlerine Göre Global Satışlar
+
+```{r, fig.width=10, fig.height=8, echo = FALSE, warning=FALSE, message=FALSE}
+# Gerekli paketleri yükle
+library(ggplot2)
+
+# Türlere göre toplam satışları hesaplama
+genre_sales <- aggregate(global_sales ~ genre, data = data_clean, sum)
+
+# Türlere göre satışları görselleştirme
+ggplot(data = genre_sales, aes(x = reorder(genre, -global_sales), y = global_sales, fill = genre)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(global_sales, 2)), vjust = -0.3) +
+  labs(title = "Oyun Turlerine Gore Global Satislar",
+       x = "Oyun Turu",
+       y = "Toplam Global Satislar") +
+  theme_minimal() +
+  coord_flip() +
+  scale_fill_brewer(palette = "Set3")
+
+```
+Grafikte görüldüğü üzere, aksiyon ve spor oyunları en yüksek satış rakamlarına sahiptir, bu da bu türlerin global oyun pazarında en fazla talep gören kategoriler olduğunu göstermektedir. Nişancı ve rol yapma oyunları da önemli bir pazar payına sahiptir. Daha niş kategoriler olan strateji ve macera oyunları ise diğer türlere kıyasla daha düşük satış rakamlarına sahiptir. Bu bilgiler, oyun geliştiricileri ve pazarlamacılar için hangi türlerin daha popüler olduğunu ve hangi alanlarda daha fazla talep olduğunu anlamak adına değerli içgörüler sunabilir.
+
+
+## Bölgeye Göre Toplam Satışlar
+
+```{r,fig.width=10, fig.height=8, echo = FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+
+# Global satışların toplamını hesapla
+total_global_sales <- sum(data_clean$global_sales)
+
+# Bölgeye göre satışları hesapla
+sales_by_region <- c(
+  NAs = sum(data_clean$na_sales),
+  EU = sum(data_clean$eu_sales),
+  JP = sum(data_clean$jp_sales),
+  Other = sum(data_clean$other_sales)
+)
+
+# Oranları hesapla
+sales_percent <- sales_by_region / total_global_sales * 100
+
+# Pasta grafiği için veri çerçevesi oluştur
+pie_data <- data.frame(
+  region = names(sales_by_region),
+  sales = sales_by_region,
+  percent = sales_percent
+)
+
+# Pasta grafiğini çiz
+pie_chart <- ggplot(pie_data, aes(x = "", y = sales, fill = region)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y", start = 0) +
+  labs(title = "Global Satışların Bolgeye Gore Dagılımı") +
+  theme_void() +
+  theme(legend.position = "bottom") +
+  # Oranları pasta grafiği üzerine yazdır
+  geom_text(aes(label = paste0(round(percent, 1), "%")), position = position_stack(vjust = 0.5)) 
+
+# Pasta grafiğini görüntüle
+print(pie_chart)
+
+```
+
+- <span style="color:turquoise;"> *NAs (Kuzey Amerika):* </span> Grafikte turkuaz renkle gösterilen Kuzey Amerika, global satışların %49.1'ini oluşturuyor. Bu, en yüksek satış oranına sahip bölge olduğunu gösteriyor.
+
+- <span style="color:lightcoral;"> *EU (Avrupa Birliği):* </span> Pembe renkle gösterilen Avrupa Birliği, global satışların %28.8'ini oluşturuyor. Bu oran, Kuzey Amerika'dan sonra ikinci sırada yer alıyor.
+
+- <span style="color:green;"> *JP (Japonya):* </span> Yeşil renkle gösterilen Japonya, global satışların %12.7'sini oluşturuyor.
+
+- <span style="color:purple;"> *Other (Diğer Bölgeler):* </span> Mor renkle gösterilen diğer bölgeler, global satışların %9.4'ünü oluşturuyor. Bu, en düşük satış oranına sahip bölge olarak karşımıza çıkıyor.
+
+Grafikten anlaşılacağı üzere, Kuzey Amerika (NAs) en büyük pazar payına sahip bölge olup, toplam satışların neredeyse yarısını (%49.1) elinde bulunduruyor. Avrupa Birliği (EU) ise %28.8 ile ikinci sırada gelirken, Japonya (JP) %12.7 ile üçüncü sırada yer almakta. Diğer bölgeler (Other) ise %9.4 ile en az paya sahip bölge olarak görülüyor.
+
+Genel olarak, satışların büyük bir kısmı Kuzey Amerika ve Avrupa Birliği bölgelerinde yoğunlaşmış durumda. Japonya ve diğer bölgeler ise daha küçük pazar paylarına sahip. Bu, firmanın stratejik olarak Kuzey Amerika ve Avrupa Birliği pazarlarına daha fazla odaklandığını veya bu bölgelerdeki tüketici talebinin diğer bölgelere göre daha yüksek olduğunu gösterebilir.
+
+
+```{r,fig.width=17, fig.height=10, echo = FALSE, warning=FALSE, message=FALSE}
+library(ggplot2)
+
+# Çıkış yılı ile toplam satışları hesaplayın
+sales_by_year <- aggregate(global_sales ~ year, data = data_clean, sum)
+
+# İlişkiyi görselleştirin
+plot1 <- ggplot(data = sales_by_year, aes(x = year, y = global_sales)) +
+  geom_point() +  # Nokta grafiği
+  geom_smooth(method = "lm", col = "red") +  # Trend çizgisi
+  labs(title = "Çıkış Yılı ile Global Satışlar Arasındaki İlişki",
+       x = "Çıkış Yılı",
+       y = "Toplam Global Satışlar") +
+  theme_minimal()
+
+# Hangi yılda çıkan oyunların en çok satıldığını belirlemek için çıkış yılına göre satışları sıralayın
+sales_by_year_sorted <- sales_by_year[order(sales_by_year$global_sales, decreasing = TRUE), ]
+
+# Satışları çubuk grafik ile görselleştirin
+plot2 <- ggplot(data = sales_by_year_sorted, aes(x = factor(year), y = global_sales, fill = factor(year))) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = global_sales), vjust = -0.5, color = "black", size = 4) +  # Çubukların üzerine değerleri yazdırma
+  labs(title = "Hangi Yılda Çıkan Oyunların En Çok Satıldığı",
+       x = "Çıkış Yılı",
+       y = "Toplam Global Satışlar") +
+  scale_fill_manual(values = rainbow(nrow(sales_by_year_sorted))) +  # Çubuk renklerini manuel olarak ayarlama
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # X eksenindeki yılları döndürme
+
+# Çizimlerin yan yana gelmesi için gridExtra paketini kullanabilirsiniz
+library(gridExtra)
+grid.arrange(plot2, ncol = 1)  # Çizimleri dikey olarak birleştirme
+```
+
+
+Bu grafikte Global satışların çıkış yıllarına göre satış miktarlarını görülmektedir. 1980 yılından 2016 yılına kadar olan satışların oranları bulunmaktadır. 1996 yılına kadar satışlar az miktarda artış göstermesine rağmen 100’ü geçmezken, 1996 yılı itibariyle satışlarda çok daha büyük bir artış oranı görülmektedir. 2008 yılında ise 522.65’lik değer ile satışlar zirveyi bulmuştur. Ancak 2016 yılına kadar satış miktarları yine 100’ün altına düşmüştür.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Gerekli paketleri yükle
+library(dplyr)
+library(knitr)
+
+# 2008 yılında çıkan oyunları filtreleyin
+games_2008 <- data_clean %>% filter(year == 2008)
+
+# 2008 yılında çıkan toplam oyun sayısını öğrenin
+total_games_2008 <- nrow(games_2008)
+
+# 2008 yılında en çok global satış yapan on oyunu belirleyin
+top_10_games_2008 <- games_2008 %>% 
+  arrange(desc(global_sales)) %>% 
+  head(10)
+
+# Tabloyu görüntüleyin
+kable(top_10_games_2008, caption = "2008 Yılında En Çok Global Satış Yapan On Oyun")
+
+# 2008 yılında çıkan toplam oyun sayısını yazdırın
+#cat("2008 yılında yayınlanan toplam oyun sayısı:", total_games_2008)
+```
+
+2008 yılında toplam 343 oyun piyasaya çıkmıştır. Bu 343 oyun içerisinde en yüksek global satış değerlerine sahip 10 oyun listelendi. Tür olarak 3 Action, 1 Racing, 1 Fighting, 2 Role- Playing, 2 Shooter, 1 Platform oyunu ilk 10 içerisinde yer almaktadır. Platform olarak da en çok tercih edilen X360 ve PS3 olmuştur ancak satış olarak Wii platformu açık ara farkla liderliği almıştır. Genel olarak racing oyunlarının tercihi kullanıcılar tarafından daha yüksek (35.82).
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Gerekli paketleri yükle
+library(dplyr)
+library(knitr)
+
+# 2008 yılında çıkan oyunları filtreleyin
+games_2009 <- data_clean %>% filter(year == 2009)
+
+# 2008 yılında çıkan toplam oyun sayısını öğrenin
+total_games_2009 <- nrow(games_2009)
+
+# 2008 yılında en çok global satış yapan on oyunu belirleyin
+top_10_games_2009 <- games_2009 %>% 
+  arrange(desc(global_sales)) %>% 
+  head(10)
+
+# Tabloyu görüntüleyin
+kable(top_10_games_2009, caption = "2009 Yılında En Çok Global Satış Yapan On Oyun")
+
+# 2008 yılında çıkan toplam oyun sayısını yazdırın
+#cat("2009 yılında yayınlanan toplam oyun sayısı:", total_games_2009)
+```
+
+2009 yılında toplam 280 oyun piyasaya çıkmıştır. Bu 280 oyun içerisinde en yüksek global satış değerlerine sahip 10 oyun listelendi. Tür olarak 2 Action, 3 Shooter, 1 Platform,  2 Sports, 1 Simulation, 1 Misc oyunu ilk 10 içerisinde yer almaktadır. Platform olarak da en çok tercih edilen Wii olmuştur. İlk 3 içinde de Wii platformu satışlarda yerini korumuştur. Genel olarak en çok tercih edilen oyun türü ise Sports olmuştur (55.00).
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# Gerekli paketleri yükle
+library(dplyr)
+library(knitr)
+
+# 2008 yılında çıkan oyunları filtreleyin
+games_1980 <- data_clean %>% filter(year == 1980)
+
+# 2008 yılında çıkan toplam oyun sayısını öğrenin
+total_games_1980 <- nrow(games_1980)
+
+# 2008 yılında en çok global satış yapan on oyunu belirleyin
+top_10_games_1980 <- games_1980 %>% 
+  arrange(desc(global_sales)) %>% 
+  head(10)
+
+# Tabloyu görüntüleyin
+kable(top_10_games_1980, caption = "1980 Yılında En Çok Global Satış Yapan On Oyun")
+
+# 2008 yılında çıkan toplam oyun sayısını yazdırın
+#cat("1980 yılında yayınlanan toplam oyun sayısı:", total_games_1980)
+```
+
+1980'li yıllar, video oyun sektörünün hızla büyüdüğü ve ev eğlencesinde devrim yarattığı bir dönemdir. Bu dönemde, Atari 2600 gibi ev konsolları popüler hale gelmiş ve arcade oyunlar büyük bir patlama yaşamıştır.1980 yılında toplam 5  oyun piyasaya çıkmıştır. Tür olarak 3 Atari, 2 Activation  yer almaktadır. Sadece 2600 platformu kullanılmıştır. Genel olarak eski oyunların tercihi günümüz piyasasında kullanıcılar tarafından  daha az tercih edilmektedir.
+
+## Platforma göre en çok satan oyunlar
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+# Her bir platformda en çok satan oyunları bulma
+top_selling_platform <- data_clean %>%
+  group_by(platform, name) %>%
+  summarise(total_sales = sum(global_sales)) %>%
+  arrange(desc(total_sales)) %>%
+  slice(1)
+
+
+# Tablonun oluşturulması
+platform_table <- top_selling_platform %>%
+  mutate(total_sales = round(total_sales, 2)) %>% # Toplam satışları yuvarla
+  kable(digits = 2, align = "c") %>%
+  kable_styling(full_width = FALSE) %>%
+  add_header_above(c("Platform" = 1, "Oyun" = 1, "Toplam Satislar" = 1))
+
+
+
+platform_table
+```
+
+Tablodaki verilere göre, Wii Sports en çok satan oyun olarak öne çıkarken, Pokemon ve Grand Theft Auto gibi popüler seriler birçok platformda yüksek satış rakamlarına ulaşmıştır. Super Mario serisi de birçok platformda en çok satanlar arasında yer almakta. Genel olarak, platformlar arasında belirli oyun serilerinin ve türlerinin uzun süreli popülariteye sahip olduğu görülmektedir.Buradaki amaç satışı yüksek olan oyunların hangi platformlarda daha çok oynandığının gözlenmesidir.Bu şekilde ileride çıkarılacak oyunun hangi platform üzerinde çıkarılması gerektiğinin analizi yapılmış oldu.
+
+## Türlere göre en çok satılan oyunlar
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+# Her bir türde en çok satan oyunları bulma
+top_selling_genre <- data_clean %>%
+  group_by(genre, name) %>%
+  summarise(total_sales = sum(global_sales)) %>%
+  arrange(desc(total_sales)) %>%
+  slice(1)
+
+# Tablonun oluşturulması
+genre_table <- top_selling_genre %>%
+  mutate(total_sales = round(total_sales, 2)) %>% # Toplam satışları yuvarla
+  kable(digits = 2, align = "c") %>%
+  kable_styling(full_width = FALSE) %>%
+  add_header_above(c("Tur" = 1, "Oyun" = 1, "Toplam Satislar" = 1))
+genre_table
+
+```
+Bu tablolar, oyun türlerine göre en çok satan oyunların satış rakamlarını göstermekte. Spor, aksiyon ve platform türleri en yüksek satış rakamlarına sahip türler olarak öne çıkarken, strateji, macera ve dövüş türleri nispeten daha düşük satış rakamlarına sahiptir. Genel olarak, popüler oyun serileri (Wii Sports, Grand Theft Auto, Super Mario, Pokemon) farklı türlerde yüksek satış rakamlarına ulaşmış ve geniş kitlelere hitap etmiştir. Bu bilgiler, oyun geliştiricileri ve pazarlamacılar için hangi türlerin ve oyunların daha popüler olduğunu anlamak adına değerli içgörüler sunmaktadır.
+
+
+**En Çok Satan Oyun Türleri ve Oyunlar:**
+
+- *Spor (Sports):* Wii Sports, 82.74 milyon adet ile en çok satan oyun olarak öne çıkıyor. Bu, spor oyunlarının büyük bir kitleye hitap ettiğini ve Wii konsolunun başarısını gösteriyor.
+
+- *Aksiyon (Action):* Grand Theft Auto V, 55.92 milyon adet satmıştır ve bu da aksiyon türündeki oyunların yüksek popülaritesini gösteriyor.
+
+- *Platform:* Super Mario Bros., 45.31 milyon adet ile platform oyunlarının ne kadar sevildiğini ve Mario serisinin ikonik başarısını göstermektedir.
+
+**Daha Az Satış Yapan Türler:**
+
+- *Macera (Adventure):* Assassin's Creed, 11.30 milyon adet ile macera türünde en çok satan oyun olmuştur. Macera türü, diğer türlere kıyasla daha düşük satış rakamlarına sahip.
+
+- *Dövüş (Fighting):* Super Smash Bros. Brawl, 13.04 milyon adet satmıştır. Dövüş oyunları, belirli bir oyuncu kitlesine hitap eder.
+
+- *Strateji (Strategy):* Pokemon Stadium, 5.45 milyon adet ile en düşük satış rakamına sahip tür olmuştur. Strateji oyunları, genellikle daha niş bir kitleye hitap eder.
+
+## Sonuç
+
+Yapılan analizler sonucunda, geliştirilecek olan oyunun ilk olarak Kuzey Amerika pazarına sonrasında ise Avrupa ve Japonya pazarlarıyla birlikte global satışlarının yapılması stratejik bir karar olacaktır. Özellikle Kuzey Amerika pazarındaki satışların daha fazla olması diğer ülkelerdeki satışları da global ölçekte olumlu olarak etkilemektedir. Platform seçiminde ise, PS2 ve PS3 satışları göz önünde bulundurulduğunda PS oyunlarının satış potansiyelinin daha yüksek olduğu gerçeğini bize sunmakta, böylelikle çıkartılacak oyunun PlayStation’ın son sürümüne ve ayrıca eski sürümlerinin de desteklediği bir oyun olmasına karar verilmiştir.
+Tür olarak, en çok ilgi gören aksiyon oyunlarına öncelik vermek, ardından spor ve shooter türlerini içeren melez bir oyun geliştirmek, Ramé Game’in piyasaya sağlam bir adımla giriş yapmasını sağlayacaktır. Bu yaklaşım, oyuncuların çeşitli tercihlerine hitap edecek ve rekabetçi piyasada öne çıkmasına yardımcı olacaktır. Böylelikle,Ramé Game’in rakiplerinden farklı yaklaşımıyla sektörde kendine sağlam bir yer edinmesi hedeflenmiştir.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

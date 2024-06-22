@@ -1,0 +1,158 @@
+---
+title: "Bilgi Yönetim Sistemi Rapor I"
+output: html_document
+date: "2024-04-30"
+---
+
+
+## Q1 : IMS platformunun belirlenmesi
+
+**Platformun İsmi:** SuiteCRM
+
+**Lisansı:** AGPLv3 (Affero General Public License version 3)
+
+**Kısa Tarihçesi:** SuiteCRM, SugarCRM'in açık kaynaklı bir türevidir. SugarCRM'in son açık kaynaklı sürümü olan SugarCRM Community Edition, SuiteCRM'in temelini oluşturmuştur. SuiteCRM projesi, SugarCRM Community Edition'ın sonlandırılmasının ardından başlatılmıştır. 2013 yılında başlatılan SuiteCRM projesi, açık kaynaklı bir topluluk tarafından geliştirilmektedir..
+
+**Platformun Kullanıcıya Sunduğu Özellikler:**
+
+- Müşteri ilişkileri yönetimi (CRM)
+
+- Satış yönetimi
+
+- Pazarlama otomasyonu
+
+- Müşteri destek yönetimi
+
+- Fırsat yönetimi
+
+- Kampanya yönetimi
+
+- Raporlama ve analiz
+
+**Kullanılan Yazılım, Veritabanı ve Diğer Teknolojiler:**
+
+- PHP (Programlama Dili)
+
+- MySQL veya MariaDB (Veritabanı)
+
+- Apache veya Nginx (Web Sunucusu)
+
+- JavaScript, HTML, CSS (Frontend Teknolojileri)
+
+**Platformun API Özellikleri:**
+
+SuiteCRM, RESTful API aracılığıyla entegrasyonlar yapılmasına olanak tanır. API, SuiteCRM verilerine erişim ve veri manipülasyonu için kullanılabilir. Özellikler arasında veri okuma, yazma, güncelleme ve silme bulunur.
+
+**Seçimin Nedenleri:**
+
+- Özel İlgi Alanları: Müşteri ilişkileri yönetimi ve açık kaynaklı yazılım projeleri benim ilgi alanlarımdan biridir. SuiteCRM, bu iki alanda bir araya gelerek ilgimi çeken bir platformdur.
+
+- Sektör Hacmi ve Popülerlik: SuiteCRM, dünya çapında birçok işletme ve kuruluş tarafından kullanılmaktadır. Bu, platformun güvenilirliğini ve kullanıcı tabanının genişliğini gösterir.
+
+- SuiteCRM'in Docker ile kurulabilirliği:  hızlı bir şekilde geliştirme ve test ortamları oluşturmayı kolaylaştırır. Docker, SuiteCRM'i hızlı bir şekilde dağıtıp kullanmamı sağlayacak esnek bir altyapı sunar. Bu da benim seçimimi daha da destekler.
+
+
+## Q2 : Dataset tanımı
+
+- *https://www.kaggle.com/datasets/asaniczka/video-game-sales-2024*
+
+Bu veri seti, çeşitli video oyunlarının özelliklerini ve satış verilerini içerir. Her bir satır, bir video oyununu temsil ederken, her sütun bir özellik veya bilgiyi içerir. Veri setinde oyunların adı, çıktığı platform, türü, yayıncısı, geliştiricisi, eleştirmen puanı, toplam satış miktarı ve bölgesel satış miktarları gibi bilgiler bulunmaktadır. Ayrıca, oyunların piyasaya çıkış tarihi ve veri setinin son güncelleme tarihi de yer almaktadır. Bu veri seti, video oyunu endüstrisindeki trendleri analiz etmek, popüler oyunları belirlemek ve oyunların satış performansını incelemek için kullanılabilir.
+
+**Veri Seti Sütun Bilgileri :**
+
+- <span style="color:blue;">*img:*</span> Oyunun kutu kapak resminin URL'sini içerir.
+
+- <span style="color:blue;">*title:*</span> Oyunun adını içerir.
+
+- <span style="color:blue;">*console:*</span> Oyunun çıktığı oyun konsolunu veya platformunu içerir (PS3, PS4, X360, vb.).
+
+- <span style="color:blue;">*genre:*</span> Oyunun türünü içerir (Aksiyon, Nişancı, Macera, vb.).
+
+- <span style="color:blue;">*publisher:*</span> Oyunun yayıncı şirketini içerir.
+
+- <span style="color:blue;">*developer:*</span> Oyunun geliştiricisi veya stüdyosunu içerir.
+
+- <span style="color:blue;">*critic_score:*</span> Oyunun eleştirmen puanını içerir (Genellikle 10 üzerinden).
+
+- <span style="color:blue;">*total_sales:*</span> Oyunun toplam satış miktarını içerir.
+
+- <span style="color:blue;">*na_sales:*</span> Oyunun Kuzey Amerika satış miktarını içerir.
+
+- <span style="color:blue;">*jp_sales:*</span> Oyunun Japonya satış miktarını içerir.
+
+- <span style="color:blue;">*pal_sales:*</span> Oyunun Avrupa satış miktarını içerir.
+
+- <span style="color:blue;">*other_sales:*</span> Oyunun diğer bölgelerdeki satış miktarını içerir.
+
+- <span style="color:blue;">*release_date:*</span> Oyunun piyasaya çıkış tarihini içerir.
+
+- <span style="color:blue;">*last_update:*</span> Veri setinin son güncelleme tarihini içerir.
+
+Veri seti, video oyunlarına ait çeşitli bilgilerin derlenmesi ve toplanması suretiyle oluşturulmuştur. Bu bilgilerin kaynağı, muhtemelen çeşitli oyun platformlarının ve yayıncıların resmi web siteleri, oyun incelemeleri ve satış verileri gibi kaynaklardır.
+
+**Verinin Formatı :** csv
+
+**Boyutu :** 2 MB
+
+IMS'e veriyi ithal etmek için, öncelikle veri setinin CSV formatındaki dosyasını IMS'in desteklediği bir veri aktarım aracı veya API üzerinden yüklemeyi planlayabiliriz.
+
+IMS'ten veriyi R ile çekmek için, IMS'in sağladığı API'yi kullanabiliriz. API, IMS veritabanına erişim sağlamak ve belirli sorgularla veri almak için kullanılabilir. Bu API'yi kullanarak, R programı aracılığıyla IMS'den istenen verileri çekebilir ve analiz için kullanabiliriz. Bunun için R dilinde API çağrılarını kullanarak veriyi çekmek için bir kod oluşturabiliriz.
+
+## Q3 : İş  tanımı 
+
+Ramé Game , oyunculara eğlenceli ve bağımlılık yaratan oyunlar sunan bir yazılım şirketidir. Kuruluş amacı, eğlence dünyasına benzersiz deneyimler katmak ve oyuncuların memnuniyetini sağlamaktır. Şirketin ana faaliyetleri arasında mobil oyunlar, masaüstü oyunlar ve sanal gerçeklik deneyimleri geliştirmek bulunmaktadır.
+
+**Rutin Operasyonlar:**
+
+- Oyun geliştirme sürecini yönetme ve koordinasyon.
+
+- Oyuncu etkileşim verilerini toplama, analiz etme ve yorumlama.
+
+- Oyun performans verilerini izleme ve analiz etme.
+
+- Teknik verileri toplama ve sorunları tespit etme.
+
+- Pazarlama verilerini toplama, analiz etme ve pazarlama stratejilerini geliştirme.
+
+**Gelir Modeli:**Ramé Game 'in gelir modeli genellikle "freemium" modeline dayanır. Şirket, oyunları ücretsiz olarak sunar ve oyunculara oyun içi satın alma seçenekleri sunarak gelir elde eder. Ayrıca, reklam gelirleri ve lisans anlaşmaları da gelir kaynakları arasında yer alabilir.
+
+**Zorluklar:**
+
+- *Rekabet:* Oyun endüstrisinde rekabet yoğun olduğundan, yeni ve çekici oyunlar geliştirmek zor olabilir.
+
+- *Teknolojik Gelişmeler:* Oyun teknolojilerindeki hızlı değişimler, sürekli olarak güncel kalmayı ve rekabet edebilmeyi gerektirir.
+
+- *Pazarlama Maliyetleri:* Oyunların fark edilmesi ve oyunculara ulaşılması için yüksek pazarlama maliyetleri olabilir.
+
+**Avantajlar:**
+
+- *Yaratıcılık ve Esneklik:* Oyun geliştirme süreci yaratıcı ve esnek bir alan olduğundan, şirketin fikirlerini özgürce ifade etmesine ve yenilikçi oyunlar üretmesine olanak tanır.
+
+- *Küresel Erişim:* Mobil oyunlar ve internet aracılığıyla, şirketin oyunları dünya genelindeki oyunculara ulaşabilir.
+
+- *Oyuncu Bağlılığı:* Bağımlılık yaratan ve eğlenceli oyunlar geliştirmek, uzun vadeli oyuncu bağlılığı ve tekrarlayan gelir sağlayabilir.
+
+**Ramé Game 'in gerçek dünya rakipleri arasında şu şirketler yer alabilir:**
+
+- *Supercell: *Dünya çapında popüler oyunlar geliştiren bir mobil oyun şirketi. Avantajları arasında büyük oyuncu kitlesi ve güçlü marka bilinirliği bulunur.
+
+- *Zynga:* Sosyal ve mobil oyunlar geliştiren bir şirket. Avantajları arasında geniş oyun portföyü ve güçlü dağıtım kanalları bulunur.
+
+- *Epic Games:* Bilgisayar ve konsol oyunları geliştiren bir şirket. Avantajları arasında güçlü teknoloji altyapısı ve büyük ölçekli oyun projeleri bulunur.
+
+## Q4 : İyileştirme (optimizasyon) stratejisi
+
+*Projenin son döneminde R kodu yazarak yapılacak veri analizi ile şu faydalar sağlanabilir:*
+
+- **Oyuncu Etkileşim Verilerinin Analizi:** Ramé Game, mobil oyunlarındaki oyuncu etkileşim verilerini analiz ederek, oyuncuların oyunlarla nasıl etkileşimde bulunduğunu anlayabiliriz. Bu analiz, oyuncu davranışlarını anlamak ve oyun deneyimini iyileştirmek için değerli içgörüler sağlayabilir. Örneğin, hangi seviyelerin oyuncuların en çok ilgisini çektiği veya hangi özelliklerin daha az kullanıldığı gibi bilgiler, oyunların daha cazip hale getirilmesine yardımcı olabilir.
+
+- **Oyun Performans Verilerinin İncelenmesi:** Ramé Game’in geliştirdiği oyunların performans verilerini analiz ederek, oyunların genel performansını değerlendirebiliriz. Örneğin, oyunlardaki ortalama oyun süresi, oyun içi satın alma oranları veya oyuncuların belirli seviyelerde sıkışıp kaldığı noktalar gibi faktörler incelenebilir. Bu analiz, oyunların kullanıcı deneyimini iyileştirmek için gereken düzeltmelerin belirlenmesine yardımcı olabilir.
+
+- **Pazarlama Verilerinin Değerlendirilmesi:** Ramé Game’in pazarlama kampanyalarının etkinliğini değerlendirmek için pazarlama verilerini analiz edebiliriz. Örneğin, farklı pazarlama kanallarının dönüşüm oranları veya belirli bir kampanyanın kullanıcı geri dönüşleri üzerindeki etkisi gibi veriler incelenebilir. Bu analiz, pazarlama stratejilerinin optimize edilmesine ve daha etkili kampanyaların oluşturulmasına yardımcı olabilir.
+
+- **Karlılık Analizi:** Ramé Game’in geliştirdiği oyunların maliyetleri ile elde edilen gelirleri karşılaştırarak karlılık analizi yapılabilir. Bu analiz, hangi oyunların şirket için en karlı olduğunu belirlemeye ve kaynakların doğru şekilde dağıtılmasına yardımcı olabilir.
+
+Bu analizlerin sonuçlarına dayanarak, şirketin oyun geliştirme sürecini optimize etmesi, kullanıcı deneyimini iyileştirmesi, pazarlama stratejilerini optimize etmesi ve karlılığını artırması beklenmektedir.
+
+
+
